@@ -36,13 +36,11 @@ class DataFilter
         array $customUserData = null,
         int $timestamp = null
     ): void {
-        if (in_array($throwable, $this->config->getIgnoredExceptions())) {
-            return;
+        if (!in_array(get_class($throwable), $this->config->getIgnoredExceptions())) {
+            $raygunClient = $this->getRaygunClient($this->config);
+            $this->setFilterParams($raygunClient);
+            $raygunClient->SendException($throwable, $tags, $customUserData, $timestamp);
         }
-
-        $raygunClient = $this->getRaygunClient($this->config);
-        $this->setFilterParams($raygunClient);
-        $raygunClient->SendException($throwable, $tags, $customUserData, $timestamp);
     }
 
     /**
